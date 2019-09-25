@@ -51,6 +51,7 @@ module.exports = {
                     forkCount
                     homepageUrl
                     stargazers { totalCount }
+                    url
                   }
                 }
               }

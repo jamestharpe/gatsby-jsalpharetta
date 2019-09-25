@@ -53,6 +53,7 @@ exports.createPages = ({
             stargazers {
               totalCount
             }
+            url
           }
         }
       }
@@ -68,6 +69,9 @@ exports.createPages = ({
           html: `
             <h2>${node.name} (${node.forkCount} forks, ${node.stargazers.totalCount} stars)</h2>
             <p>${node.description}</p>
+            <p>
+              <a href="${node.url}" target="_blank>Lear more!</a>
+            </p>
           `,
           fileAbsolutePath: node.stargazers.totalCount,
         },
