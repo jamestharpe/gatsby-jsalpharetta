@@ -112,6 +112,8 @@ Gatsby's "entry point" into generating your application. Export [Gatsby function
 
 Template components are for page types e.g. blog posts, slides, products. Layout components are for components shared _across_ pages e.g. headers, footers, sidebars, etc.
 
+_Generally_ templates use layouts, but layouts don't use templates.
+
 ## Just Enough React
 
 ## Just Enough GraphQL
