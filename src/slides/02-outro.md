@@ -6,7 +6,7 @@ Images can be embedded from the local filesystem!
 
 ---
 
-![Monkey](//i.imgur.com/PnbINJ6.gif)
+![Monkey](https://i.imgur.com/PnbINJ6.gif)
 
 🌟 Star it on [GitHub](//github.com/fabe/gatsby-deck),  
 or create your own with:

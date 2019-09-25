@@ -4,7 +4,7 @@ Presentation and Demo Project for https://www.meetup.com/JavaScriptAlpharetta/ev
 
 ## Overview
 
-![Gatsby Process Flow](gatsby-process-flow.png)
+![Gatsby Process Flow](2-gatsby-process-flow.png)
 
 ## Quick Start
 
@@ -74,11 +74,13 @@ Common bits of data to be reused accross the site.
 
 Example use:
 
-```html
+```jsx
 <Helmet
   title={`${site.siteMetadata.title} — {site.siteMetadata.name}`}
 />
 ```
+
+> [Helmet](https://github.com/nfl/react-helmet) makes it easy to control content in the `<head>`
 
 ##### `plugins`
 
@@ -104,7 +106,7 @@ Gatsby's "entry point" into generating your application. Export [Gatsby function
 
 * `src/components` _conventionally_ keeps our React components.
 * `src/pages` keeps the pre-defined pages of our app. Gatsby auto-generates a page per `js` file. Additional pages can be created using data and tempaltes.
-* `src/layouts` _conventionally_ keeps our layout React components. [Layouts](https://www.gatsbyjs.org/tutorial/part-three/) are just React components that wrap other React components with common elements (e.g. header, footer, etc). Some folks keep their layouts in the `src/components` folder.
+* `src/layouts` _conventionally_ keeps our layout React components. [Layouts](https://www.gatsbyjs.org/tutorial/part-three/) are just React components that wrap other React components with common elements (e.g. header, footer, etc). Most folks keep their layouts in the `src/components` folder (as recommended), but this is necessary for [`gatsby-plugin-layout`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-plugin-layout) support.
 * `src/slides` _project specific_ content to define our slides - this becomes queryable data thanks to the `gatsby-source-filesystem` and `gatsby-transformer-remark` plug-ins.
 * `src/templates`
 
@@ -114,6 +116,192 @@ Template components are for page types e.g. blog posts, slides, products. Layout
 
 _Generally_ templates use layouts, but layouts don't use templates.
 
+## How it All Works
+
+### `gatsby develop|build`
+
+1. Gatsby reads `gatsby-config.js` and initializes the plug-ins.
+2. Gatsby calls the functions exported from `gastby-node.js`
+3. `exports.createPages` queries the markdown in `src/slides`
+4. For each markdown file, we:
+   1. Create nodes for each slide with `createNode`. [Nodes](https://www.gatsbyjs.org/docs/node-interface/) are how data is modeled in Gatsby. This will make querying "slides" (rather than markdowns) easier later.
+   2. Create pages for each slide with `createPage`. The `component` property tells Gatsby which _template_ to use to render the page, in this case `src/templates/slide.js`.
+5. `exports.sourceNodes` creates the [GraphQL schema](https://graphql.org/learn/schema/) for our Slide objects.
+
+#### When a Page is Created
+
+```javascript
+// From gatsby-node.js
+createPage({
+  path: `/${index + 1}`, // the path to the page
+  component: slideTemplate, // template to use
+  context: { // passed to props.pageContext
+    index: index + 1 // Used to query the slide
+  },
+});
+```
+
+```jsx
+// From src/templates/slide.js
+export default ({ data, transition }) => (
+  <div style={{'width': '100%'}}>
+    <div
+      style={transition && transition.style}
+      dangerouslySetInnerHTML={{ __html: data.slide.html }}
+    />
+  </div>
+);
+
+export const query = graphql`
+  # $index is populated by context in the createPage call
+  query SlideQuery($index: Int!) {
+    # SlideQuery was defined in our sourceNodes function in gatsby-node.js ('type Slide...')
+
+    # Populate the "slide" property of the "data" property of props
+    slide(index: { eq: $index }) {
+      html
+      index
+    }
+  }
+`;
+```
+
+More resources:
+
+* [Inferring Input Filters](https://www.gatsbyjs.org/docs/schema-input-gql/)
+
 ## Just Enough React
 
+React is a functional-style library (not a framework!) to produce web UIs. At it's core, React converts models (in the form of "state" and "props") to views.
+
+Let's revisit part of the slide template:
+
+```jsx
+// From src/templates/slide.js
+
+// A function that takes in props...
+export default ({ data, transition }) => (
+  // And returns a vew for those props
+  <div style={{'width': '100%'}}>
+    <div
+      style={transition && transition.style}
+      dangerouslySetInnerHTML={{ __html: data.slide.html }}
+    />
+  </div>
+);
+```
+
+More resources:
+
+* [Learn React in 10 Tweets](https://twitter.com/chrisachard/status/1175022111758442497)
+* [Gatsby: HTML in our JavaScript?](https://www.gatsbyjs.org/tutorial/part-one/#wait-html-in-our-javascript)
+* [Intro to React Tutorial](https://reactjs.org/tutorial/tutorial.html)
+* [Thinking in React](https://reactjs.org/docs/thinking-in-react.html)
+
 ## Just Enough GraphQL
+
+A GraphQL service definines types, then provides functions to resolve each field on each type. In Gatsby,plug-ins define "nodes", which Gatsby can resolve in-memory, or [custom resolvers](https://www.gatsbyjs.org/docs/node-apis/#createResolvers) for more advanced use cases.
+
+We defined our type in `gatsby-node.js`:
+
+```graphql
+  type Slide implements Node {
+    html: String
+    index: Int
+  }
+```
+
+And loaded them into memory by calling `createNode` in `gatsby-node.js`:
+
+```javascript
+  createNode({
+    id: createNodeId(`${node.id}_${index + 1} >>> Slide`),
+    parent: node.id,
+    children: [],
+    internal: {
+      type: `Slide`,
+      contentDigest: createContentDigest(html),
+    },
+    html: html,
+    index: index + 1,
+  });
+```
+
+We can then query the data in a way very similar to SQL:
+
+```javascript
+// Query
+allSlide {
+  edges { node { id, html, index } }
+}
+site {
+  siteMetadata {
+    date
+    name
+    title
+  }
+}
+
+// Output
+{
+  "data": {
+    "allSlide": {
+      "edges": [
+        {
+          "node": {
+            "index": 1,
+            "html": "..."
+          }
+        },
+        // ...
+      ]
+    },
+    "site": {
+      "siteMetadata": {
+        "date": "September 25, 2019",
+        "name": "James Tharpe",
+        "title": "JavaScript Alpharetta - Gatsby"
+      }
+    }
+  }
+}
+```
+
+```javascript
+// Query
+allSlide(filter: {index: {eq: 3}}) {
+  edges {
+    node {
+      html
+      index
+    }
+  }
+}
+
+// Output
+{
+  "data": {
+    "allSlide": {
+      "edges": [
+        {
+          "node": {
+            "html": "\n<h1>🤫</h1>\n",
+            "index": 3
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+More resources:
+
+* [Introduction to GraphQL](https://graphql.org/learn/)
+* [How to GraphQL](https://www.howtographql.com/)
+* [Gatsby GraphQL Concepts](https://www.gatsbyjs.org/docs/graphql-concepts/)
+
+### The GraphiQL Explorer
+
+![GraphiQL](3-graphiql.png)
+

@@ -69,7 +69,7 @@ exports.createPages = ({ actions, createContentDigest, createNodeId, graphql }) 
         component: slideTemplate,
         context: {
           index: index + 1,
-          absolutePath: process.cwd() + `/src/slides#${index + 1}`,
+          // absolutePath: process.cwd() + `/src/slides#${index + 1}`,
         },
       });
     });
