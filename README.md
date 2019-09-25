@@ -75,8 +75,9 @@ Common bits of data to be reused accross the site.
 Example use:
 
 ```html
-<!-- Header Component -->
-<title>About {data.site.siteMetadata.title}</title>
+<Helmet
+  title={`${site.siteMetadata.title} — {site.siteMetadata.name}`}
+/>
 ```
 
 ##### `plugins`
@@ -99,17 +100,17 @@ Typical usecases for plugins:
 
 Gatsby's "entry point" into generating your application. Export [Gatsby function](https://www.gatsbyjs.org/docs/node-apis/) implementations to generate your app.
 
-### Gatsby Starter Deck Files
+### Project Structure
 
-#### `src/components`
+* `src/components` _conventionally_ keeps our React components.
+* `src/pages` keeps the pre-defined pages of our app. Gatsby auto-generates a page per `js` file. Additional pages can be created using data and tempaltes.
+* `src/layouts` _conventionally_ keeps our layout React components. [Layouts](https://www.gatsbyjs.org/tutorial/part-three/) are just React components that wrap other React components with common elements (e.g. header, footer, etc). Some folks keep their layouts in the `src/components` folder.
+* `src/slides` _project specific_ content to define our slides - this becomes queryable data thanks to the `gatsby-source-filesystem` and `gatsby-transformer-remark` plug-ins.
+* `src/templates`
 
-#### `src/layouts`
+#### Layouts vs. Templates
 
-#### `src/pages`
-
-#### `src/slides`
-
-#### `src/templates`
+Template components are for page types e.g. blog posts, slides, products. Layout components are for components shared _across_ pages e.g. headers, footers, sidebars, etc.
 
 ## Just Enough React
 
