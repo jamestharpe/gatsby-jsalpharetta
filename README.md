@@ -336,3 +336,35 @@ Next, install the `gatsby-source-github` plug-in:
 ```bash
 npm install gatsby-source-github --save-dev
 ```
+
+And configure it in `gatsby-config.js`:
+
+```javascript
+{
+  resolve: 'gatsby-source-github',
+  options: {
+    headers: {
+      Authorization: `Bearer ...`, // https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/
+    },
+    queries: [
+      `{ 
+        user(login: "jamestharpe") {
+          repositories(first: 5, orderBy: { field: STARGAZERS, direction: DESC}) {
+            edges {
+              node {
+                description
+                name
+                forkCount
+                homepageUrl
+                stargazers { totalCount }
+              }
+            }
+          }
+        }
+      }`,
+    ],
+  },
+}
+```
+
+Generate pages in `gatsby-node.js`:

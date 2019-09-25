@@ -1,5 +1,5 @@
-const path = require('path');
-const _ = require('lodash');
+const path = require("path");
+const _ = require("lodash");
 
 // Remove trailing slash
 exports.onCreatePage = ({ page, actions }) => {
@@ -23,7 +23,12 @@ exports.onCreatePage = ({ page, actions }) => {
 };
 
 // Create pages from markdown nodes
-exports.createPages = ({ actions, createContentDigest, createNodeId, graphql }) => {
+exports.createPages = ({
+  actions,
+  createContentDigest,
+  createNodeId,
+  graphql,
+}) => {
   const { createPage, createNode } = actions;
   const slideTemplate = path.resolve(`src/templates/slide.js`);
 
@@ -37,17 +42,51 @@ exports.createPages = ({ actions, createContentDigest, createNodeId, graphql }) 
           }
         }
       }
+
+      allGithubRepositories {
+        edges {
+          node {
+            description
+            forkCount
+            homepageUrl
+            name
+            stargazers {
+              totalCount
+            }
+          }
+        }
+      }
     }
   `).then(result => {
     if (result.errors) {
       return Promise.reject(result.errors);
     }
 
-    const slides = result.data.allMarkdownRemark.edges;
-    slides.sort((a, b) => a.node.fileAbsolutePath > b.node.fileAbsolutePath ? 1 : -1)
-    const nodes = slides.flatMap((s) => s.node.html.split('<hr>').map((html) => ({
-      node: s.node, html
-    })));
+    const repos = result.data.allGithubRepositories.edges.map(({ node }) => {
+      return {
+        node: {
+          html: `
+            <h2>${node.name} (${node.forkCount} forks, ${node.stargazers.totalCount} stars)</h2>
+            <p>${node.description}</p>
+          `,
+          fileAbsolutePath: node.stargazers.totalCount,
+        },
+      };
+    });
+
+    const slides = result.data.allMarkdownRemark.edges.concat(repos);
+
+    console.log("Slides", slides);
+
+    slides.sort((a, b) =>
+      a.node.fileAbsolutePath > b.node.fileAbsolutePath ? 1 : -1
+    );
+    const nodes = slides.flatMap(s =>
+      s.node.html.split("<hr>").map(html => ({
+        node: s.node,
+        html,
+      }))
+    );
 
     nodes.forEach(({ node, html }, index) => {
       createNode({

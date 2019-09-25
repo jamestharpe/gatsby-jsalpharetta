@@ -34,5 +34,30 @@ module.exports = {
     },
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
+    {
+      resolve: 'gatsby-source-github',
+      options: {
+        headers: {
+          Authorization: `Bearer BEARER_GOES_HERE`,
+        },
+        queries: [
+          `{ 
+            user(login: "jamestharpe") {
+              repositories(first: 5, orderBy: { field: STARGAZERS, direction: DESC}) {
+                edges {
+                  node {
+                    description
+                    name
+                    forkCount
+                    homepageUrl
+                    stargazers { totalCount }
+                  }
+                }
+              }
+            }
+          }`,
+        ],
+      },
+    }
   ],
 };
