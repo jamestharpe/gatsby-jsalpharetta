@@ -4,7 +4,7 @@ Presentation and Demo Project for https://www.meetup.com/JavaScriptAlpharetta/ev
 
 ## Overview
 
-![Gatsby Process Flow](2-gatsby-process-flow.png)
+![Gatsby Process Flow](src/slides/2-gatsby-process-flow.png)
 
 ## Quick Start
 
@@ -46,7 +46,7 @@ gatsby develop
 
 Open [localhost:8000](http://localhost:8000/) and Voilà!
 
-![Gatsby Deck](1-gatsby-deck.png)
+![Gatsby Deck](src/slides/1-gatsby-deck.png)
 
 ### Make a Change
 
@@ -303,7 +303,7 @@ More resources:
 
 ### The GraphiQL Explorer
 
-![GraphiQL](3-graphiql.png)
+![GraphiQL](src/slides/3-graphiql.png)
 
 ## Build a Portfolio Presentation from GitHub
 
