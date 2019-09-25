@@ -73,7 +73,7 @@ exports.createPages = ({
               <a href="${node.url}" target="_blank>Lear more!</a>
             </p>
           `,
-          fileAbsolutePath: node.stargazers.totalCount,
+          fileAbsolutePath: "z" + node.stargazers.totalCount,
         },
       };
     });
