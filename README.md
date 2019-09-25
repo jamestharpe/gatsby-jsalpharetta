@@ -66,7 +66,38 @@ Starters are boilerplate Gatsby sites.
 
 #### `gatsby-config.js`
 
+**Full Documentation:** [Gatsby Config API Docs](https://www.gatsbyjs.org/docs/gatsby-config/) and [Data in Gatsby Tutorial](https://www.gatsbyjs.org/tutorial/part-four/#data-in-gatsby)
+
+##### `siteMetadata`
+
+Common bits of data to be reused accross the site.
+
+Example use:
+
+```html
+<!-- Header Component -->
+<title>About {data.site.siteMetadata.title}</title>
+```
+
+##### `plugins`
+
+[Plugins](https://www.gatsbyjs.org/docs/plugins/) are NodeJS packages that implement [Gatsby Node APIs](https://www.gatsbyjs.org/docs/node-apis/). Plugins can extend and modify virtually everything Gatsby does.
+
+Typical usecases for plugins:
+
+* Make external data or content available via GraphQL (files, databases, you-name-it)
+* Transform data from various formats to JSON objects
+* Inject third-party services (e.g. Google Analytics)
+
+##### More
+
+* [`polyfill`](https://www.gatsbyjs.org/docs/gatsby-config/#polyfill) - Exclude the default Promise polyfill.
+* [`mapping`](https://www.gatsbyjs.org/docs/gatsby-config/#mapping-node-types) - Create foreign-key-like relationships between data sources
+* [`proxy`](https://www.gatsbyjs.org/docs/gatsby-config/#proxy) - proxy unknown requests to the develop to a specified server
+
 #### `gatsby-node.js`
+
+Gatsby's "entry point" into generating your application. Export [Gatsby function](https://www.gatsbyjs.org/docs/node-apis/) implementations to generate your app.
 
 ### Gatsby Starter Deck Files
 
